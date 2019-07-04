@@ -67,11 +67,56 @@ def Ball_Track():
                         data = PID()                            #Get Servo Angles to send by PID
                         Serial_C(data)                          #Send data to Arduino
 
+def Translate_X():
+    while(True):
+        time.sleep(1)
+        Serial_C("110070070110110110*")
+        time.sleep(1)
+        Serial_C("070110110070070070*")
+        
+def Translate_Y():
+    while(True):
+        time.sleep(1)
+        Serial_C("110090090070070110*")
+        time.sleep(1)
+        Serial_C("070090090110110070*")
+
+
+        
+def Translate_Z():
+    while(True):
+        time.sleep(1)
+        Serial_C("110110110110110110*")
+        time.sleep(1)
+        Serial_C("070070070070070070*")
+        
+def Rotate_X():
+    while(True):
+        time.sleep(1)
+        Serial_C("090090090090110110*")
+        time.sleep(1)
+        Serial_C("090090090090070070*")
+        
+def Rotate_Y():
+    while(True):
+        time.sleep(1)
+        Serial_C("110110070070090090*")
+        time.sleep(1)
+        Serial_C("070070110110090090*")
+        
+def Rotate_Z():
+    while(True):
+        time.sleep(1)
+        Serial_C("110070110070110070*")
+        time.sleep(1)
+        Serial_C("070110070110070110*")
+
+
 def PID():
 
     global x_cor,y_cor,i
     global int_x,int_y,prev_x,prev_y
-    global portion
+    global portion,prev_ang1,prev_ang2
 
     
     dx = 15*(i[0]-x_cor/2)//x_cor                           #Co-ordinates of Ball maped in cm
@@ -101,10 +146,10 @@ def PID():
         Data_2 = max(-15,min(15,int(Kp*Angle_2+Kd*(prev_ang2-Angle_2)+Ki*(prev_ang2+Angle_2))))
 
         Servo_1 = str(90-Data_2).zfill(3)
-        Servo_2 = str(90+Data_2).zfill(3)
+        Servo_2 = str(90-Data_2).zfill(3)
         Servo_3 = str(90).zfill(3)
         Servo_4 = str(90).zfill(3)
-        Servo_5 = str(90-Data_1).zfill(3)
+        Servo_5 = str(90+Data_1).zfill(3)
         Servo_6 = str(90+Data_1).zfill(3)
                              
         portion = 1
@@ -123,8 +168,8 @@ def PID():
         Data_2 = max(-15,min(15,int(Kp*Angle_2+Kd*(prev_ang2-Angle_2)+Ki*(prev_ang2+Angle_2))))
 
         Servo_1 = str(90-Data_1).zfill(3)
-        Servo_2 = str(90+Data_1).zfill(3)
-        Servo_3 = str(90-Data_2).zfill(3)
+        Servo_2 = str(90-Data_1).zfill(3)
+        Servo_3 = str(90+Data_2).zfill(3)
         Servo_4 = str(90+Data_2).zfill(3)
         Servo_5 = str(90).zfill(3)
         Servo_6 = str(90).zfill(3)
@@ -145,9 +190,9 @@ def PID():
 
         Servo_1 = str(90).zfill(3)
         Servo_2 = str(90).zfill(3)
-        Servo_3 = str(90-Data_1).zfill(3)
+        Servo_3 = str(90+Data_1).zfill(3)
         Servo_4 = str(90+Data_1).zfill(3)
-        Servo_5 = str(90+Data_2).zfill(3)
+        Servo_5 = str(90-Data_2).zfill(3)
         Servo_6 = str(90-Data_2).zfill(3)
         
         portion = 3
@@ -166,10 +211,10 @@ def PID():
         Data_2 = max(-15,min(15,int(Kp*Angle_2+Kd*(prev_ang2-Angle_2)+Ki*(prev_ang2+Angle_2))))
 
         Servo_1 = str(90+Data_2).zfill(3)
-        Servo_2 = str(90-Data_2).zfill(3)
+        Servo_2 = str(90+Data_2).zfill(3)
         Servo_3 = str(90).zfill(3)
         Servo_4 = str(90).zfill(3)
-        Servo_5 = str(90+Data_1).zfill(3)
+        Servo_5 = str(90-Data_1).zfill(3)
         Servo_6 = str(90-Data_1).zfill(3)
                              
         portion = 4
@@ -188,8 +233,8 @@ def PID():
         Data_2 = max(-15,min(15,int(Kp*Angle_2+Kd*(prev_ang2-Angle_2)+Ki*(prev_ang2+Angle_2))))
 
         Servo_1 = str(90+Data_1).zfill(3)
-        Servo_2 = str(90-Data_1).zfill(3)
-        Servo_3 = str(90+Data_2).zfill(3)
+        Servo_2 = str(90+Data_1).zfill(3)
+        Servo_3 = str(90-Data_2).zfill(3)
         Servo_4 = str(90-Data_2).zfill(3)
         Servo_5 = str(90).zfill(3)
         Servo_6 = str(90).zfill(3)
@@ -211,9 +256,9 @@ def PID():
 
         Servo_1 = str(90).zfill(3)
         Servo_2 = str(90).zfill(3)
-        Servo_3 = str(90+Data_1).zfill(3)
+        Servo_3 = str(90-Data_1).zfill(3)
         Servo_4 = str(90-Data_1).zfill(3)
-        Servo_5 = str(90-Data_2).zfill(3)
+        Servo_5 = str(90+Data_2).zfill(3)
         Servo_6 = str(90+Data_2).zfill(3)
 
         portion = 6
@@ -233,46 +278,81 @@ def Serial_C(data):
     
 if __name__ == "__main__":
     global j,img2,Left,Right,Top,Bottom,dst,thresh1,frame,Points,m,x_cor,y_cor,i
-    
+
     while(True):
-        j=j+1
-  
-        # Capture frame-by-frame
-        ret, frame = cap.read()  # ret = 1 if the video is captured; frame is the image
+        print("Press 1 for Ball Balncing")
+        print("Press 2 for X-Translation")
+        print("Press 3 for Y-Translation")
+        print("Press 4 for Z-Translation")
+        print("Press 5 for X-Rotation")
+        print("Press 6 for Y-Rotation")
+        print("Press 7 for Z-Rotation")
+        print("Press 9 to Leave")
 
-        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        ret,thresh = cv2.threshold(gray,120,255,cv2.THRESH_BINARY_INV)
-        (_,contour,hierarchy)=cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)  #Contours for Platform  
-        
-        if len(contour) != 0:
-                c = max(contour, key = cv2.contourArea) # find the largest contour
-                img2=cv2.drawContours(frame, c, -1, color, thickness) # draw largest contour
-
-                if(j>=25):          #From 25th Frame for settling the image
-        
-                    Platform(c)     #Make Platform Contours
-    
-                if(j>=25):
-
-                    Ball_Track()    #Make Ball Track Contours
-                    
-                    cv2.circle(img2, Left, 8, (0, 0, 255), -1)        #Points (Extreme Display)
-                    cv2.circle(img2, Right, 8, (0, 255, 0), -1)
-                    cv2.circle(img2, Top, 8, (255, 0, 0), -1)
-                    cv2.circle(img2, Bottom, 8, (0, 255, 0), -1)
-
-                    cv2.circle(dst,(i[0],i[1]), 8, (0, 255, 0), -1)
-                        
-                    cv2.imshow('Original View',img2)                  #Display all 3 views
-                    cv2.imshow('B&W',thresh1)
-                    cv2.imshow('Tracking',dst)
-
-                    
-        # Display the resulting image
-        #cv2.imshow('Contour',img3)
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit    
-           break
+        choice = int(input("Your Choice Please :"))
+        if(choice == 2):
+            Translate_X()
             
-    # When everything done, release the capture
-    cap.release()
-    cv2.destroyAllWindows()
+        elif(choice == 3):
+            Translate_Y()
+            
+        elif(choice == 4):
+            Translate_Z()
+
+        elif(choice == 5):
+            Rotate_X()
+
+        elif(choice == 6):
+            Rotate_Y()
+        
+        elif(choice == 7):
+            Rotate_Z()
+
+        elif(choice == 9):
+            break
+            
+        elif(choice == 1):
+            while(True):
+                j=j+1
+          
+                # Capture frame-by-frame
+                ret, frame = cap.read()  # ret = 1 if the video is captured; frame is the image
+
+                gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                ret,thresh = cv2.threshold(gray,100,255,cv2.THRESH_BINARY_INV)
+                (_,contour,hierarchy)=cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)  #Contours for Platform  
+                
+                if len(contour) != 0:
+                        c = max(contour, key = cv2.contourArea) # find the largest contour
+                        img2=cv2.drawContours(frame, c, -1, color, thickness) # draw largest contour
+
+                        if(j>=25):          #From 25th Frame for settling the image
+                
+                            Platform(c)     #Make Platform Contours
+            
+                        if(j>=25):
+
+                            Ball_Track()    #Make Ball Track Contours
+                            
+                            cv2.circle(img2, Left, 8, (0, 0, 255), -1)        #Points (Extreme Display)
+                            cv2.circle(img2, Right, 8, (0, 255, 0), -1)
+                            cv2.circle(img2, Top, 8, (255, 0, 0), -1)
+                            cv2.circle(img2, Bottom, 8, (0, 255, 0), -1)
+
+                            #cv2.circle(dst,(i[0],i[1]), 8, (0, 255, 0), -1)
+                                
+                            cv2.imshow('Original View',img2)                  #Display all 3 views
+                            cv2.imshow('B&W',thresh1)
+                            cv2.imshow('Tracking',dst)
+
+                            
+                # Display the resulting image
+                #cv2.imshow('Contour',img3)
+                if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit    
+                   break
+                    
+            # When everything done, release the capture
+            cap.release()
+            cv2.destroyAllWindows()
+            
+        else: print("Invalid Choice")
