@@ -55,7 +55,7 @@ def Ball_Track():
             #print(len(approx))
             if peri != 0 :
                 #print(area/peri)
-                if (len(approx)>=7 and area/peri > 8):      # circle will have more than 7 sides and also area/peri is Radius/2
+                if (len(approx)>=7 and area/peri > 2):      # circle will have more than 7 sides and also area/peri is Radius/2
                     print(area/peri)
                     dst=cv2.drawContours(dst, cont_bw[q], -1, [0,255,0], thickness) #Draw contours of the ball
                     M = cv2.moments(cont_bw[q])
@@ -67,15 +67,15 @@ def Ball_Track():
                         data = PID()                            #Get Servo Angles to send by PID
                         Serial_C(data)                          #Send data to Arduino
 
-def Translate_X():
-    while(True):
+def Translate_X(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("110070070110110110*")
         time.sleep(1)
         Serial_C("070110110070070070*")
         
-def Translate_Y():
-    while(True):
+def Translate_Y(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("110090090070070110*")
         time.sleep(1)
@@ -83,29 +83,29 @@ def Translate_Y():
 
 
         
-def Translate_Z():
-    while(True):
+def Translate_Z(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("110110110110110110*")
         time.sleep(1)
         Serial_C("070070070070070070*")
         
-def Rotate_X():
-    while(True):
+def Rotate_X(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("090090090090110110*")
         time.sleep(1)
         Serial_C("090090090090070070*")
         
-def Rotate_Y():
-    while(True):
+def Rotate_Y(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("110110070070090090*")
         time.sleep(1)
         Serial_C("070070110110090090*")
         
-def Rotate_Z():
-    while(True):
+def Rotate_Z(break_time):
+    while(time.time() < break_time):
         time.sleep(1)
         Serial_C("110070110070110070*")
         time.sleep(1)
@@ -116,16 +116,16 @@ def PID():
 
     global x_cor,y_cor,i
     global int_x,int_y,prev_x,prev_y
-    global portion,prev_ang1,prev_ang2
+    global portion,prev_ang1,prev_ang2,dst,img2
 
     
-    dx = 15*(i[0]-x_cor/2)//x_cor                           #Co-ordinates of Ball maped in cm
-    dy = 15*(i[1]-y_cor/2)//y_cor
+    dx = 15*(i[0]-x_cor/2+40)//x_cor                           #Co-ordinates of Ball maped in cm
+    dy = 15*(-i[1]+y_cor/2-30)//y_cor
+
     
-    
-    Kp = 1       #1
-    Kd = -40     #-35   
-    Ki = 0.05   #-0.01                                          #PID co-efficients
+    Kp = 1    #1
+    Kd = -65     #-35   
+    Ki = 0.015   #-0.01                                          #PID co-efficients
 
     distance = (dx*dx + dy*dy )**0.5
     theta= np.degrees(math.atan2(dy,dx))
@@ -265,6 +265,7 @@ def PID():
  
     arduino = Servo_1 + Servo_2 + Servo_3 + Servo_4 + Servo_5 + Servo_6 + "*"              #End of command character
 
+    print(arduino)
     prev_ang1 = Angle_1
     prev_ang2 = Angle_2
     
@@ -287,26 +288,45 @@ if __name__ == "__main__":
         print("Press 5 for X-Rotation")
         print("Press 6 for Y-Rotation")
         print("Press 7 for Z-Rotation")
+        print("Press 8 for ALL 6 DoF")
         print("Press 9 to Leave")
-
+        print("\n")
+        
+        
         choice = int(input("Your Choice Please :"))
+        break_time = time.time()+10
         if(choice == 2):
-            Translate_X()
+            Translate_X(break_time)
             
         elif(choice == 3):
-            Translate_Y()
+            Translate_Y(break_time)
             
         elif(choice == 4):
-            Translate_Z()
+            Translate_Z(break_time)
 
         elif(choice == 5):
-            Rotate_X()
+            Rotate_X(break_time)
 
         elif(choice == 6):
-            Rotate_Y()
+            Rotate_Y(break_time)
         
         elif(choice == 7):
-            Rotate_Z()
+            Rotate_Z(break_time)
+
+        elif(choice == 8):
+            break_time = time.time()+10
+            Translate_X(break_time)
+            break_time = time.time()+10
+            Translate_Y(break_time)
+            break_time = time.time()+10
+            Translate_Z(break_time)
+            break_time = time.time()+10
+            Rotate_X(break_time) 
+            break_time = time.time()+10
+            Rotate_Y(break_time)
+            break_time = time.time()+10
+            Rotate_Z(break_time)
+                
 
         elif(choice == 9):
             break
@@ -319,7 +339,7 @@ if __name__ == "__main__":
                 ret, frame = cap.read()  # ret = 1 if the video is captured; frame is the image
 
                 gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-                ret,thresh = cv2.threshold(gray,100,255,cv2.THRESH_BINARY_INV)
+                ret,thresh = cv2.threshold(gray,105,255,cv2.THRESH_BINARY_INV)
                 (_,contour,hierarchy)=cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)  #Contours for Platform  
                 
                 if len(contour) != 0:
